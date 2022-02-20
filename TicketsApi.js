@@ -106,15 +106,15 @@ class TicketsApi {
         const response = await this.instance.get(`queue/consulates/${consulateId}/schedule?date=${date}&dateEnd=${dateEnd}&serviceId=${serviceId}`).then(res => res).catch(err => err);
         if(response?.response?.status === 401) {
             await this.updateAuthToken();
-            // return this.getServiceId();
+            return this.getSchedules();
         }
 
-        const { data } = response?.data;
-        if(!data) return null;
+        if(Array.isArray(response.data) && response?.data?.length === 0) {
+            console.log("[INFO]", "Empty tickets list.");
+            return null;
+        }
 
-        console.log(data, data?.length);
-
-        return data?.length;
+        return response;
     }
 
     loadSavedToken () {

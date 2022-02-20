@@ -1,5 +1,3 @@
-const axios = require("axios");
-const fs = require("fs");
 const TicketsApi = require("./TicketsApi");
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
@@ -14,5 +12,5 @@ const service = "Оформлення закордонного паспорта"
     // Initialisation
     const Api = new TicketsApi(country, consulate, serviceCategory, service);
 
-    const serviceId = await Api.getSchedules();
+    const schedules = await Api.getSchedules();
 })();
