@@ -21,6 +21,8 @@ class TicketsApi {
         this.siteKey = "6LcPNjgbAAAAAIp0KyR2RK_e7gb6ECDXR0n-JLqG";
         this.captchaKey = "a0b76abb37db80b699ae4444e11f3a27";
 
+        this.fetchingToken = false;
+
         this.instance = axios.create({
             baseURL: 'https://online.mfa.gov.ua/api/v1/',
             timeout: 5000
@@ -39,7 +41,7 @@ class TicketsApi {
         }
 
         const countryId = (data.find(x => x.name.includes(this.country)))?.id;
-        console.log('[INFO]', `Country code is: ${countryId}.`)
+        // console.log('[INFO]', `Country code is: ${countryId}.`)
 
         return countryId;
     }
@@ -57,7 +59,7 @@ class TicketsApi {
         if(!data) return null;
 
         const consulateId = (data.find(x => x.shortName.includes(this.consulate)))?.id;
-        console.log('[INFO]', `ConsulateID code is: ${consulateId}.`)
+        // // console.log('[INFO]', `ConsulateID code is: ${consulateId}.`)
 
         return consulateId;
     }
@@ -75,7 +77,7 @@ class TicketsApi {
         if(!data) return null;
 
         const serviceCategoryId = (data.find(x => x.name.includes(this.serviceCategory)))?.id;
-        console.log('[INFO]', `ServiceCategoryId code is: ${serviceCategoryId}.`)
+        // console.log('[INFO]', `ServiceCategoryId code is: ${serviceCategoryId}.`)
 
         return serviceCategoryId;
     }
@@ -94,7 +96,7 @@ class TicketsApi {
         if(!data) return null;
 
         const serviceId = (data.find(x => x.shortName.includes(this.service)))?.id;
-        console.log('[INFO]', `ServiceId code is: ${serviceId}.`)
+        // console.log('[INFO]', `ServiceId code is: ${serviceId}.`)
 
         return serviceId;
     }
@@ -131,17 +133,26 @@ class TicketsApi {
     }
 
     async updateAuthToken() {
-        const countryId = await this.getCountryId();
-        const gresponse = await ac.solveRecaptchaV2Proxyless(this.siteURL, this.siteKey)
+        try {
+            if(this.fetchingToken) return;
+            this.fetchingToken = true;
 
-        const { token } = (await this.instance.post(`auth/session`, { "g-recaptcha-response": gresponse, countryId }))?.data;
+            const countryId = await this.getCountryId();
+            const gresponse = await ac.solveRecaptchaV2Proxyless(this.siteURL, this.siteKey)
 
-        fs.writeFileSync('./auth_token.json', JSON.stringify({
-            auth_token: token,
-            create_date: Date.now()
-        }, null, 2));
+            const { token } = (await this.instance.post(`auth/session`, { "g-recaptcha-response": gresponse, countryId }).then(res => res).catch(err => err))?.data;
 
-        this.instance.defaults.headers.Authorization = `Bearer ${token}`;
+            fs.writeFileSync('./auth_token.json', JSON.stringify({
+                auth_token: token,
+                create_date: Date.now()
+            }, null, 2));
+
+            this.instance.defaults.headers.Authorization = `Bearer ${token}`;
+        } catch (e) {
+            console.log(e.message)
+        } finally {
+            this.fetchingToken = false;
+        }
     }
 }
 
