@@ -12,6 +12,7 @@
   "dependencies": {
     "@antiadmin/anticaptchaofficial": "^1.0.18",
     "axios": "^0.26.0",
-    "moment": "^2.29.1"
+    "moment": "^2.29.1",
+    "telegraf": "^3.38.0"
   }
 }
