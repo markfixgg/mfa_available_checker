@@ -1,0 +1,17 @@
+{
+  "name": "tickets_parser",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@antiadmin/anticaptchaofficial": "^1.0.18",
+    "axios": "^0.26.0",
+    "moment": "^2.29.1"
+  }
+}
